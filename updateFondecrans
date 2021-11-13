@@ -1,0 +1,34 @@
+#! /bin/bash
+
+cd "`dirname "$0"`"
+git pull
+rm -rf current_wallpaper
+mkdir current_wallpaper
+cd current_wallpaper
+num=0
+while read -r filename; do
+	ln -s "$filename" "$(printf '%05d' $num).jpg"
+	(( num++ ))
+done < <( find ../photos -type f | shuf )
+
+curdir="`pwd`"
+
+xmlFile="$RANDOM_$RANDOM.xml"
+
+echo "<background>" > $xmlFile
+for ((i=0;i<num;i++)); do
+	echo "	<static>" >> $xmlFile
+	echo "		<duration>60</duration>" >> $xmlFile
+	echo "		<file>$curdir/$(printf '%05d' $i).jpg</file>" >> $xmlFile
+	echo "	</static>" >> $xmlFile
+	echo "	<transition>" >> $xmlFile
+	echo "		<duration>2</duration>" >> $xmlFile
+	echo "		<from>$curdir/$(printf '%05d' $i).jpg</from>" >> $xmlFile
+	echo "		<to>$curdir/$(printf '%05d' `echo "$(((i + 1) % num))"`).jpg</to>" >> $xmlFile
+	echo "	</transition>" >> $xmlFile
+done
+echo "</background>" >> $xmlFile
+
+gsettings set org.gnome.desktop.background picture-uri "file://$curdir/$xmlFile"
+
+
