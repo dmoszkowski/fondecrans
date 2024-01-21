@@ -30,5 +30,4 @@ done
 echo "</background>" >> $xmlFile
 
 gsettings set org.gnome.desktop.background picture-uri "file://$curdir/$xmlFile"
-
-
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$curdir/$xmlFile"
